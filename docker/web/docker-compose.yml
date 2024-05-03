@@ -1,0 +1,38 @@
+networks:
+  default:
+    name: unc-network
+    driver: bridge
+    external: false
+  conakry:
+    external: true
+
+services:
+    apache-1:
+        image: ubuntu/apache2:2.4-20.04_beta
+        container_name: server_1
+        ports:
+           - 8080:80
+        networks:
+            - default
+            - conakry
+        volumes:
+            - ./site1:/var/www/html
+    apache-2:
+        image: ubuntu/apache2:2.4-20.04_beta
+        container_name: server_2
+        ports:
+           - 8089:80
+        networks:
+            - default
+        volumes:
+           - ./site2:/var/www/html
+    nginx-1:
+        image: nginx:mainline-alpine-otel
+        container_name: server_3 
+        ports:
+           - 8090:80
+        networks:
+            - default
+        volumes:
+           - ./site2:/usr/share/nginx/html
+  
