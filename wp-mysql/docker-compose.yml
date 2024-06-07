@@ -1,0 +1,49 @@
+services:
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress_password
+      MYSQL_ROOT_PASSWORD: root_password
+    networks:
+      default:
+       ipv4_address: 172.25.0.20
+      proxy-net:
+
+    volumes:
+      - db_data:/var/lib/mysql
+
+  wordpress:
+    image: wordpress:php8.3-apache
+    container_name: wordpress-mysql
+    ports:
+      - 8080:80
+    volumes:
+      - ./wordpress-site:/var/www/html
+    networks:
+      default:
+       ipv4_address: 172.25.0.10
+      proxy-net:
+
+    depends_on:
+      - db
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress_password
+      WORDPRESS_DB_NAME: wordpress
+networks:
+  default:
+    name: wp-net
+    driver: bridge
+    external: true
+    ipam:
+     config:
+       - subnet: 172.25.0.0/16
+         gateway: 172.25.0.1
+  proxy-net:
+    external: true
+
+volumes:
+  db_data:
